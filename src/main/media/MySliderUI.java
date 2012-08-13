@@ -31,7 +31,7 @@ class MySliderUI extends BasicSliderUI {
         g2d.setColor(new Color(45,45,45,255));       
         g2d.fillRect(0, t.height/2, t.width+tw2-shorter+5, 3);
         g2d.setColor(new Color(255,255,255,255));  
-        int xv = t2.x-t.x+5;
+        int xv = t2.x-t.x+10;
         if(xv <0){
         	xv=0;
         }

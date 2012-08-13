@@ -46,6 +46,7 @@ import javax.swing.JSlider;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -53,6 +54,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.plaf.ScrollPaneUI;
+import javax.swing.plaf.synth.SynthLookAndFeel;
 
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
@@ -117,9 +119,11 @@ public class MusicPlayer extends JFrame implements Runnable {
         addMouseListener(new MouseListenerDemo());
         addMouseMotionListener(new MouseMotionListenerDemo());
         loadSongLibraryXML();
-        updating = true;
-        list.setSelectedIndex(songQueue.getSongIndex());
-        updating = false;
+        if(songQueue != null){
+	        updating = true;
+	        list.setSelectedIndex(songQueue.getSongIndex());
+	        updating = false;
+        }
     }
 
     private ImageIcon loadArtworkImage(Image image) {
@@ -147,6 +151,7 @@ public class MusicPlayer extends JFrame implements Runnable {
         starRater.setSelection(rating); 
         updating = true;
         list.setSelectedIndex(songQueue.getSongIndex());
+        list.ensureIndexIsVisible(list.getSelectedIndex());
         updating = false;
     }
 
@@ -181,35 +186,21 @@ public class MusicPlayer extends JFrame implements Runnable {
         final Animator leftAnimator = new Animator(200);
         leftAnimator.setAcceleration(0.3f);
         leftAnimator.setDeceleration(0.2f);
-//        leftAnimator.addTarget(new PropertySetter(playButton, "location", new Point(playButton.getX() + 200, playButton.getY())));
-//        leftAnimator.addTarget(new PropertySetter(pauseButton, "location", new Point(pauseButton.getX() + 200,pauseButton.getY())));
-//        leftAnimator.addTarget(new PropertySetter(prevButton, "location", new Point(prevButton.getX() + 200, prevButton.getY())));
-//        leftAnimator.addTarget(new PropertySetter(nextButton, "location", new Point(nextButton.getX() + 200, nextButton.getY())));
-//        leftAnimator.addTarget(new PropertySetter(nameBar, "location", new Point(nameBar.getX() + 200, nameBar.getY())));
         leftAnimator.addTarget(new PropertySetter(positionBar, "size", new Dimension((positionBar.getSize().width * 2)-1, positionBar.getSize().height)));
         leftAnimator.addTarget(new PropertySetter(rightLayoutButton, "location", new Point( rightLayoutButton.getX() + 200, rightLayoutButton.getY())));
         leftAnimator.addTarget(new PropertySetter(leftLayoutButton, "location", new Point( leftLayoutButton.getX() + 200, leftLayoutButton.getY())));
         leftAnimator.addTarget(new PropertySetter(minimiseButton, "location", new Point(minimiseButton.getX() + 200, minimiseButton.getY())));
         leftAnimator.addTarget(new PropertySetter(closeButton, "location", new Point(closeButton.getX() + 200, closeButton.getY())));
         leftAnimator.addTarget(new PropertySetter(starRater, "location", new Point(starRater.getX() + 200, starRater.getY())));
-//        leftAnimator.addTarget(new PropertySetter(volumeSlider, "location", new Point(volumeSlider.getX() + 200, volumeSlider.getY())));
-//        leftAnimator.addTarget(new PropertySetter(shuffleButton, "location", new Point(shuffleButton.getX() + 200, shuffleButton.getY())));
-//        leftAnimator.addTarget(new PropertySetter(loopAllButton, "location", new Point(loopAllButton.getX() + 200, loopAllButton.getY())));
-//        leftAnimator.addTarget(new PropertySetter(loopSongButton, "location", new Point(loopSongButton.getX() + 200, loopSongButton.getY())));
         leftAnimator.addTarget(new PropertySetter(volumeSlider, "size", volumeSlider.getSize()));
         leftAnimator.addTarget(new PropertySetter(songsList, "size", songsList.getSize()));
         leftAnimator.addTarget(new PropertySetter(background, "location", new Point(background.getX() + 200, background .getY()))); 
-        leftAnimator.addTarget(new PropertySetter(this, "size", new Dimension(400, 200)));
+        leftAnimator.addTarget(new PropertySetter(this, "size", new Dimension(399, 200)));
         ActionTrigger.addTrigger(leftLayoutButton, leftAnimator);
 
         final Animator rightAnimator = new Animator(200);
         rightAnimator.setAcceleration(0.3f);
         rightAnimator.setDeceleration(0.2f);
-//        rightAnimator.addTarget(new PropertySetter(playButton, "location", playButton.getLocation()));
-//        rightAnimator.addTarget(new PropertySetter(pauseButton, "location", pauseButton.getLocation()));
-//        rightAnimator.addTarget(new PropertySetter(prevButton, "location", prevButton.getLocation()));
-//        rightAnimator.addTarget(new PropertySetter(nextButton, "location", nextButton.getLocation()));
-//        rightAnimator.addTarget(new PropertySetter(nameBar, "location", nameBar.getLocation()));
         rightAnimator.addTarget(new PropertySetter(positionBar, "size", positionBar.getSize()));
         rightAnimator.addTarget(new PropertySetter(rightLayoutButton, "location", rightLayoutButton.getLocation()));
         rightAnimator.addTarget(new PropertySetter(leftLayoutButton, "location", leftLayoutButton.getLocation()));
@@ -218,9 +209,6 @@ public class MusicPlayer extends JFrame implements Runnable {
         rightAnimator.addTarget(new PropertySetter(starRater, "location", starRater.getLocation()));
         rightAnimator.addTarget(new PropertySetter(volumeSlider, "size", new Dimension(0, (int)volumeSlider.getSize().getHeight())));
         rightAnimator.addTarget(new PropertySetter(songsList, "size", new Dimension(0, (int)songsList.getSize().getHeight())));
-//        rightAnimator.addTarget(new PropertySetter(shuffleButton, "location", shuffleButton.getLocation()));
-//        rightAnimator.addTarget(new PropertySetter(loopAllButton, "location", loopAllButton.getLocation()));
-//        rightAnimator.addTarget(new PropertySetter(loopSongButton, "location", loopSongButton.getLocation()));
         rightAnimator.addTarget(new PropertySetter(background, "location", background.getLocation()));
         rightAnimator.addTarget(new PropertySetter(this, "size", new Dimension(200, 200)));
         ActionTrigger.addTrigger(rightLayoutButton, rightAnimator);
@@ -378,6 +366,7 @@ public class MusicPlayer extends JFrame implements Runnable {
         positionBar.addMouseListener(new PositionBarMouseListener());
         positionBar.setBackground(new Color(0, 0, 0, 255));
         positionBar.setBorderPainted(false);
+        positionBar.setUI(new MyProgressBarUI());
         pane.add(positionBar, 0);
 
         nameBar = new JLabel();
@@ -402,7 +391,7 @@ public class MusicPlayer extends JFrame implements Runnable {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
-        list.setBackground(new Color(45,45,45,255));
+        list.setBackground(new Color(0,0,0,255));
         Font font = new Font("Calibri", Font.PLAIN, 16);
         list.setForeground(new Color(105,105,105,255));
         list.setFont(font );
@@ -421,19 +410,13 @@ public class MusicPlayer extends JFrame implements Runnable {
 		});
 		songsList = new JScrollPane(list);
 		songsList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		songsList.setBounds(new Rectangle(210,10,145,160));
+		songsList.setBounds(new Rectangle(210,30,180,130));
 		MyScrollBar b = new MyScrollBar();
 		songsList.setVerticalScrollBar(b);
-		songsList.setBackground(new Color(45,45,45,255));
+		songsList.setBackground(new Color(0,0,0,255));
 		songsList.setWheelScrollingEnabled(true);
-		songsList.setBorder(BorderFactory.createEmptyBorder());
-		
+		songsList.setBorder(BorderFactory.createEmptyBorder());		
         pane.add(songsList, 3);
-        
-        
-        
-        
-
         return pane;
     }
     
@@ -548,11 +531,17 @@ public class MusicPlayer extends JFrame implements Runnable {
 			public void propertyChange(PropertyChangeEvent arg0) {
 				String name = arg0.getPropertyName();
 				if(name.equals("libraryLoaded") ){
+					songLibrary=null;
 					songLibrary = (SongLibrary) arg0.getNewValue();
-					float volume = songQueue.getVolume();
-					boolean random = songQueue.isRandom();
-					boolean loopone = songQueue.isLoopSong();
+					float volume = 0.5f;
+					boolean random =false;
+					boolean loopone =false;
+					if(songQueue !=null){
+					 volume = songQueue.getVolume();
+					 random = songQueue.isRandom();
+					 loopone = songQueue.isLoopSong();
 					songQueue.stop();
+					}
 					pauseButton.setVisible(false);
 					playButton.setVisible(true);
 					songQueue = null;
@@ -589,15 +578,14 @@ public class MusicPlayer extends JFrame implements Runnable {
     }
 
     public static void main(String[] args) {
-        // final SynthLookAndFeel lookAndFeel = new SynthLookAndFeel();
-
-        // try{
-        //
-        // lookAndFeel.load(new File("C:\\xml\\synthDemo.xml").toURI().toURL());
-        // UIManager.setLookAndFeel(lookAndFeel);
-        // } catch (Exception e) {
-        // int i =9;
-        // }
+         final SynthLookAndFeel lookAndFeel = new SynthLookAndFeel();
+         try{
+         UIManager.setLookAndFeel(
+        		    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+         
+         } catch (Exception e) {
+           System.out.println("failed to load windows look and feel");
+           }   
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -648,7 +636,7 @@ public class MusicPlayer extends JFrame implements Runnable {
         MyScrollBar() {
             super();            
             setUI(new MyScrollUI());
-            setBackground(new Color(45,45,45,255));
+            setBackground(new Color(0,0,0,255));
             
         }
     }
